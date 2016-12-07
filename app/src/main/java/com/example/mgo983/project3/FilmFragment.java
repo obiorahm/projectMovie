@@ -1,5 +1,6 @@
 package com.example.mgo983.project3;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -62,6 +64,16 @@ public class FilmFragment extends Fragment {
         GridView gridview = (GridView) rootView.findViewById(R.id.film_gridview);
         //ListView listView = (ListView) rootView.findViewById(R.id.film_gridview);
         gridview.setAdapter(adapter);
+
+        gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l){
+                Intent detailActivityIntent = new Intent(getActivity(), MovieDetailActivity.class);
+                startActivity(detailActivityIntent);
+            }
+
+        });
+
+
 
         return rootView;
 
@@ -194,10 +206,11 @@ public class FilmFragment extends Fragment {
             String ConfJsonStr = getJSONData("https://api.themoviedb.org/3/configuration?",
                     "api_key", "query", 1);
 
-            MovieDBParser ParsePosterData = new MovieDBParser();
 
             try{
-                    String[] PosterData = ParsePosterData.getMoviePoster(MovieJsonStr, ConfJsonStr);
+                    MovieDBParser ParsePosterData = new MovieDBParser(MovieJsonStr, ConfJsonStr);
+
+                    String[] PosterData = ParsePosterData.getMoviePoster();
                     return PosterData;
                 }catch (JSONException jsonex){
                     Log.e(LOG_TAG, "Error ", jsonex);

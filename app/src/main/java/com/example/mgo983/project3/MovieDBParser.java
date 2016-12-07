@@ -15,10 +15,24 @@ import java.util.List;
 
 public class MovieDBParser {
 
-    public String[] getMoviePoster(String MovieDBdata, String ConfDBdata) throws JSONException{
+    private String[] movieIds = {};
+    private String[] moviePosters = {};
+    private String baseUrlandPosterSize;
 
+    private String getBaseUrlandPosterSize(String ConfDBdata) throws  JSONException{
+
+        //get conf results
+        JSONObject ConfData = new JSONObject(ConfDBdata);
+        JSONObject imageData = ConfData.getJSONObject("images");
+        String baseUrl = imageData.getString("base_url");
+        String posterSize = imageData.getJSONArray("poster_sizes").getString(4);
+        return baseUrl + posterSize;
+    }
+
+    public MovieDBParser(String MovieDBdata, String ConfDBdata) throws JSONException{
         final String MOVIEDB_RESULTS = "results";
         final String MOVIEDB_POSTERURL = "poster_path";
+        final String MOVIEDB_ID = "id";
 
 
         List<String> PosterUrls = new ArrayList<String>();
@@ -28,30 +42,32 @@ public class MovieDBParser {
         JSONObject MovieSearchResults = new JSONObject(MovieDBdata);
         JSONArray movieArray = MovieSearchResults.getJSONArray(MOVIEDB_RESULTS);
 
-
-        //get conf results
-        JSONObject ConfData = new JSONObject(ConfDBdata);
-        JSONObject imageData = ConfData.getJSONObject("images");
-        String baseUrl = imageData.getString("base_url");
-        String posterSize = imageData.getJSONArray("poster_sizes").getString(4);
-
         for(int i = 0; i < movieArray.length(); i++){
 
             String imageFilePath = movieArray.getJSONObject(i).getString(MOVIEDB_POSTERURL).replace("\\" , "");
+            String imageId = movieArray.getJSONObject(i).getString(MOVIEDB_ID);
 
             if(imageFilePath.equals("null")){
 
             }else{
                 Log.v("IMAGE URLS ", imageFilePath + i);
-                PosterUrls.add(baseUrl + posterSize + "/" + imageFilePath);
+                PosterUrls.add(getBaseUrlandPosterSize(ConfDBdata) + "/" + imageFilePath);
             }
-
-
 
         }
 
         String[] simplePosterUrlsArray = new String[PosterUrls.size()];
-        return PosterUrls.toArray(simplePosterUrlsArray);
-
+        moviePosters = PosterUrls.toArray(simplePosterUrlsArray);
     }
+
+
+
+    public String[] getMovieId() {
+        return movieIds;
+    }
+
+    public String[] getMoviePoster(){
+        return moviePosters;
+    }
+    
 }
