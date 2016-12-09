@@ -26,6 +26,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by mgo983 on 12/4/16.
@@ -37,6 +39,11 @@ public class FilmFragment extends Fragment {
     public ImageGridAdapter adapter;
 
     public static final String EXTRA_TEXT = "com.example.mgo983.project1.EXTRA_TEXT";
+    public static final String TITLE_TEXT = "com.example.mgo983.project1.TITLE_TEXT";
+    public static final String OVERVIEW_TEXT = "com.example.mgo983.project1.OVERVIEW_TEXT";
+    public static final String VOTE_AVERAGES_TEXT = "com.example.mgo983.project1.VOTE_AVERAGES_TEXT";
+    public static final String RELEASE_DATE_TEXT = "com.example.mgo983.project1.RELEASE_DATE_TEXT";
+
 
     /*public static String[] filmArray = {"http://i.imgur.com/rFLNqWI.jpg",
             "http://ab.pbimgs.com/pbimgs/ab/images/dp/wcm/201640/0079/trieste-side-chair-o.jpg",
@@ -44,6 +51,8 @@ public class FilmFragment extends Fragment {
             "http://i.imgur.com/rFLNqWI.jpg"};*/
 
     public String[] filmArray = {};
+
+    public List<String[]> MovieData = new ArrayList<String[]>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -68,6 +77,15 @@ public class FilmFragment extends Fragment {
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l){
                 Intent detailActivityIntent = new Intent(getActivity(), MovieDetailActivity.class);
+
+                Bundle extras = new Bundle();
+                extras.putString(EXTRA_TEXT, MovieData.get(0)[position]);
+                extras.putString(TITLE_TEXT,MovieData.get(2)[position]);
+                extras.putString(OVERVIEW_TEXT,MovieData.get(3)[position]);
+                extras.putString(VOTE_AVERAGES_TEXT, MovieData.get(4)[position]);
+                extras.putString(RELEASE_DATE_TEXT, MovieData.get(5)[position]);
+                detailActivityIntent.putExtras(extras);
+
                 startActivity(detailActivityIntent);
             }
 
@@ -210,8 +228,10 @@ public class FilmFragment extends Fragment {
             try{
                     MovieDBParser ParsePosterData = new MovieDBParser(MovieJsonStr, ConfJsonStr);
 
-                    String[] PosterData = ParsePosterData.getMoviePoster();
-                    return PosterData;
+                    MovieData = ParsePosterData.getMovieData();
+
+                    Log.v(LOG_TAG, "Waywood " + MovieData.get(0)[1]);
+                    return MovieData.get(0);
                 }catch (JSONException jsonex){
                     Log.e(LOG_TAG, "Error ", jsonex);
                 }

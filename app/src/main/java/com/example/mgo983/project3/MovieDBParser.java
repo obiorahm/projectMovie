@@ -6,6 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,9 +16,17 @@ import java.util.List;
 
 public class MovieDBParser {
 
-    private String[] movieIds = {};
-    private String[] moviePosters = {};
-    private String baseUrlandPosterSize;
+    private List <String[]> MovieData = new ArrayList<String[]>();
+
+
+
+    final String MOVIEDB_POSTER_URL = "poster_path";
+    final String MOVIEDB_ID = "id";
+    final String MOVIEDB_ORIGINAL_TITLE = "original_title";
+    final String MOVIEDB_OVERVIEW = "overview";
+    final String MOVIEDB_VOTE_AVERAGE = "vote_average";
+    final String MOVIEDB_RELEASE_DATE = "release_date";
+    final String MOVIEDB_RESULTS = "results";
 
     private String getBaseUrlandPosterSize(String ConfDBdata) throws  JSONException{
 
@@ -30,12 +39,17 @@ public class MovieDBParser {
     }
 
     public MovieDBParser(String MovieDBdata, String ConfDBdata) throws JSONException{
-        final String MOVIEDB_RESULTS = "results";
-        final String MOVIEDB_POSTERURL = "poster_path";
-        final String MOVIEDB_ID = "id";
 
 
-        List<String> PosterUrls = new ArrayList<String>();
+        List<String> movieIds = new ArrayList<String>();
+        List<String> moviePosters = new ArrayList<String>();
+        List<String> movieOriginaltitles = new ArrayList<String>();
+        List<String> movieOverviews = new ArrayList<String>();
+        List<String> movieVoteAverages= new ArrayList<String>();
+        List<String> movieReleaseDates = new ArrayList<String>();
+
+
+
 
         //get the result object
 
@@ -44,30 +58,61 @@ public class MovieDBParser {
 
         for(int i = 0; i < movieArray.length(); i++){
 
-            String imageFilePath = movieArray.getJSONObject(i).getString(MOVIEDB_POSTERURL).replace("\\" , "");
-            String imageId = movieArray.getJSONObject(i).getString(MOVIEDB_ID);
+            String imageFilePath = movieArray.getJSONObject(i).getString(MOVIEDB_POSTER_URL).replace("\\" , "");
+
+
+
 
             if(imageFilePath.equals("null")){
 
             }else{
                 Log.v("IMAGE URLS ", imageFilePath + i);
-                PosterUrls.add(getBaseUrlandPosterSize(ConfDBdata) + "/" + imageFilePath);
+
+
+
+                String imageId = movieArray.getJSONObject(i).getString(MOVIEDB_ID);
+                String originalTitle = movieArray.getJSONObject(i).getString(MOVIEDB_ORIGINAL_TITLE);
+                String overview = movieArray.getJSONObject(i).getString(MOVIEDB_OVERVIEW);
+                String voteAverage = movieArray.getJSONObject(i).getString(MOVIEDB_VOTE_AVERAGE);
+                String releaseDate = movieArray.getJSONObject(i).getString(MOVIEDB_RELEASE_DATE);
+
+
+                movieIds.add(imageId);
+                moviePosters.add(getBaseUrlandPosterSize(ConfDBdata) + imageFilePath);
+                movieOriginaltitles.add(originalTitle);
+                movieOverviews.add(overview);
+                movieVoteAverages.add(voteAverage);
+                movieReleaseDates.add(releaseDate);
+
+
             }
 
         }
 
-        String[] simplePosterUrlsArray = new String[PosterUrls.size()];
-        moviePosters = PosterUrls.toArray(simplePosterUrlsArray);
+
+
+        int ArraySize = movieIds.size();
+        String[] simpleMovieIds = new String[ArraySize];
+        String[] simpleMoviePosters = new String[ArraySize];
+        String[] simpleMovieOriginalTitles = new String[ArraySize];
+        String[] simpleMovieOverviews = new String[ArraySize];
+        String[] simpleMovieVoteAverages = new String[ArraySize];
+        String[] simpleMovieReleaseDates = new String[ArraySize];
+
+        MovieData.add(moviePosters.toArray(simpleMoviePosters));
+        MovieData.add(movieIds.toArray(simpleMovieIds));
+        MovieData.add(movieOriginaltitles.toArray(simpleMovieOriginalTitles));
+        MovieData.add(movieOverviews.toArray(simpleMovieOverviews));
+        MovieData.add(movieVoteAverages.toArray(simpleMovieVoteAverages));
+        MovieData.add(movieReleaseDates.toArray(simpleMovieReleaseDates));
+
+
     }
 
 
 
-    public String[] getMovieId() {
-        return movieIds;
+    public List<String[]> getMovieData(){
+        return MovieData;
     }
 
-    public String[] getMoviePoster(){
-        return moviePosters;
-    }
-    
 }
