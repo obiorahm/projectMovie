@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <ListPreference
+        android:title="@string/pref_search_label"
+        android:key="@string/pref_search_key"
+        android:dialogTitle="@string/pref_search_title"
+        android:entries="@array/pref_search_entries"
+        android:entryValues="@array/pref_search_entryValues"
+        android:defaultValue="@string/pref_search_defaultValue" />
+</PreferenceScreen>
