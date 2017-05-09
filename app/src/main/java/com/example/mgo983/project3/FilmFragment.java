@@ -2,6 +2,8 @@ package com.example.mgo983.project3;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -87,6 +89,8 @@ public class FilmFragment extends Fragment {
                 extras.putString(OVERVIEW_TEXT,MovieData.get(3)[position]);
                 extras.putString(VOTE_AVERAGES_TEXT, MovieData.get(4)[position]);
                 extras.putString(RELEASE_DATE_TEXT, MovieData.get(5)[position]);
+
+
                 detailActivityIntent.putExtras(extras);
 
                 startActivity(detailActivityIntent);
@@ -99,6 +103,7 @@ public class FilmFragment extends Fragment {
         return rootView;
 
     }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -137,9 +142,17 @@ public class FilmFragment extends Fragment {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String prefSearchParam = sharedPref.getString(getString(R.string.pref_search_key),getString(R.string.pref_search_defaultValue));
 
+        if (isOnline()){
+            FetchMovieTask fetchMovieTask = new FetchMovieTask();
+            fetchMovieTask.execute(prefSearchParam);
+        }
+    }
 
-        FetchMovieTask fetchMovieTask = new FetchMovieTask();
-        fetchMovieTask.execute(prefSearchParam);
+    public boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getActivity().getSystemService(getActivity().CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
     public class FetchMovieTask extends AsyncTask<String, Void, String[]>{
@@ -147,9 +160,10 @@ public class FilmFragment extends Fragment {
 
         @Override
         protected void onPostExecute(final String[] Result){
-            adapter = new ImageGridAdapter(getActivity(), Result);
-            GridView gridview = (GridView) getActivity().findViewById(R.id.film_gridview);
-            gridview.setAdapter(adapter);
+                adapter = new ImageGridAdapter(getActivity(), Result);
+                GridView gridview = (GridView) getActivity().findViewById(R.id.film_gridview);
+                gridview.setAdapter(adapter);
+
 
         }
 
@@ -177,7 +191,6 @@ public class FilmFragment extends Fragment {
                             .appendQueryParameter(API_KEY,api_Key_val)
                             .appendQueryParameter(LANG,"en-US")
                             .build();
-
                 }else{
                     buildUri = Uri.parse(MOVIEDB_BASE_URL).buildUpon()
                             .appendQueryParameter(API_KEY,api_Key_val)
@@ -257,7 +270,14 @@ public class FilmFragment extends Fragment {
                     "api_key", "query", 1);
 
 
+            //get_ movie_trailer(String id);
+
+            //get_movie
+
+
+
             try{
+
                     MovieDBParser ParsePosterData = new MovieDBParser(MovieJsonStr, ConfJsonStr);
 
                     MovieData = ParsePosterData.getMovieData();
@@ -272,6 +292,12 @@ public class FilmFragment extends Fragment {
 
             return null;
 
+        }
+
+        public String getTrailer(String Id){
+            String TrailerJsonStr = getJSONData("https://api.themoviedb.org/3/movie/"+ Id +"/videos?",
+                    "api_key", "language", 0);
+            return TrailerJsonStr;
         }
 
     }

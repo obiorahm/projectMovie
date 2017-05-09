@@ -10,8 +10,11 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -47,6 +50,8 @@ public class MovieDetailActivity extends ActionBarActivity {
         public PlaceholderFragment() {
         }
 
+        public ArrayAdapter<String> adapter;
+
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
@@ -80,9 +85,30 @@ public class MovieDetailActivity extends ActionBarActivity {
             TextView releaseDates = (TextView) layout.findViewById(R.id.det_release_date);
             releaseDates.setText(intent.getStringExtra(FilmFragment.RELEASE_DATE_TEXT));
 
+            String[] trailerArray = {"one", "two", "three", "four"};
+
+            adapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_trailer, trailerArray);
+
+            ListView list = (ListView) layout.findViewById(R.id.listview_trailer);
+            list.setAdapter(adapter);
+
             getActivity().setTitle(movieTitle);
 
             return layout;
+        }
+
+        @Override
+        public void onStart(){
+            super.onStart();
+
+            String[] trailerArray = {"one", "two", "three", "four"};
+
+            adapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_trailer,R.id.list_item_trailer_textview,trailerArray);
+
+            ListView list = (ListView) getActivity().findViewById(R.id.listview_trailer);
+            list.setAdapter(adapter);
+
+
         }
     }
 }
